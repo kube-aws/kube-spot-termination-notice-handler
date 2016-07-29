@@ -1,0 +1,10 @@
+FROM mumoshu/kubectl:%%KUBE_VERSION%%
+
+# Install kubectl
+RUN apk add --update --no-cache curl
+
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
