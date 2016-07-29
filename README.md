@@ -29,7 +29,7 @@ Run `kubectl logs` against the handler pod to watch how it works.
 
 ```
 $ kubectl logs --namespace kube-system spot-termination-notice-handler-ibyo6
-This script polls the "EC2 Spot Instance Termination Notices" endpoint to gracefully stop and then reschedule all the pods running on this Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing this node is terminated.
+This script polls the "EC2 Spot Instance Termination Notices" endpoint to gracefully stop and then reschedule all the pods running on this Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing the node is terminated.
 See https://aws.amazon.com/jp/blogs/aws/new-ec2-spot-instance-termination-notices/ for more information.
 `kubectl drain minikubevm` will be executed once a termination notice is made.
 Polling http://169.254.169.254/latest/meta-data/spot/termination-time every 5 second(s)
