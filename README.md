@@ -5,6 +5,17 @@ Once a termination notice is received, it will try to gracefully stop all the po
 
     $ kubectl create -f spot-termination-notice-handler.daemonset.yaml
 
+## Avaiable docker images/tags
+
+Tags denotes Kubernetes/`kubectl` versions.
+Using the same version for your Kubernetes cluster and spot-termination-notice-handler is recommended.
+
+* `mumoshu/spot-termination-notice-handler:1.2.5`
+* `mumoshu/spot-termination-notice-handler:1.3.0`
+* `mumoshu/spot-termination-notice-handler:1.3.1`
+* `mumoshu/spot-termination-notice-handler:1.3.2`
+* `mumoshu/spot-termination-notice-handler:1.3.3`
+
 ## Why use it
 
   * So that your kubernetes jobs backed by spot instances can keep running on another instances(typically on-demand instances)
