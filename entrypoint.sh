@@ -16,7 +16,7 @@ if [ "${POD_NAME}" == "" ]; then
   exit 1
 fi
 
-NODE_NAME=$(kubectl --namespace ${NAMESPACE} get pod ${POD_NAME} --output jsonpath="{.Spec.NodeName}")
+NODE_NAME=$(kubectl --namespace ${NAMESPACE} get pod ${POD_NAME} --output jsonpath="{.spec.nodeName}")
 
 if [ "${NODE_NAME}" == "" ]; then
   echo "[ERROR] Unable to fetch the name of the node running the pod \"${POD_NAME}\" in the namespace \"${NAMESPACE}\". Maybe a bug?: " 1>&2

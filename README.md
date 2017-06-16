@@ -15,6 +15,7 @@ Using the same version for your Kubernetes cluster and spot-termination-notice-h
 * `mumoshu/spot-termination-notice-handler:1.3.1`
 * `mumoshu/spot-termination-notice-handler:1.3.2`
 * `mumoshu/spot-termination-notice-handler:1.3.3`
+* `kylegato/spot-termination-notice-handler:1.5.3`
 
 ## Why use it
 
