@@ -41,7 +41,7 @@ echo $(date): ${http_status}
 
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
-kubectl drain ${NODE_NAME}
+kubectl drain ${NODE_NAME} --force --ignore-daemonsets
 
 # Sleep for 120 seconds to prevent this script from looping.
 # The instance should be terminated by the end of the sleep.
