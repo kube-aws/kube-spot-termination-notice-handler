@@ -1,5 +1,5 @@
 KUBE_VERSION ?= 1.3.3
-VERSION ?= 0.9.0
+VERSION ?= 0.9.1
 REPOSITORY ?= mumoshu/kube-spot-termination-notice-handler
 TAG ?= $(KUBE_VERSION)-$(VERSION)
 IMAGE ?= $(REPOSITORY):$(TAG)
