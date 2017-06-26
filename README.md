@@ -15,6 +15,7 @@ Using the same version for your Kubernetes cluster and spot-termination-notice-h
 * `mumoshu/spot-termination-notice-handler:1.3.1`
 * `mumoshu/spot-termination-notice-handler:1.3.2`
 * `mumoshu/spot-termination-notice-handler:1.3.3`
+* `kylegato/spot-termination-notice-handler:1.5.3`
 
 ## Why use it
 
@@ -40,3 +41,7 @@ Fri Jul 29 07:39:14 UTC 2016: 404
 ...
 Fri Jul 29 hh:mm:ss UTC 2016: 200
 ```
+
+## Kubernetes 1.6+
+
+Use Dockerfile-1.6 or image kylegato/spot-termination-notice-handler:1.5.3 for kubernetes clusters >=1.6
