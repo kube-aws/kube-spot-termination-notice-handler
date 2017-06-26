@@ -16,6 +16,7 @@ Using the same version for your Kubernetes cluster and spot-termination-notice-h
 * `mumoshu/spot-termination-notice-handler:1.3.2`
 * `mumoshu/spot-termination-notice-handler:1.3.3`
 * `kylegato/spot-termination-notice-handler:1.5.3`
+* `kylegato/spot-termination-notice-handler:1.5.3-1` (Has Slack notifications feature.)
 
 ## Why use it
 
@@ -45,3 +46,31 @@ Fri Jul 29 hh:mm:ss UTC 2016: 200
 ## Kubernetes 1.6+
 
 Use Dockerfile-1.6 or image kylegato/spot-termination-notice-handler:1.5.3 for kubernetes clusters >=1.6
+
+## Slack Notifications
+Introduced in version 0.9.2 of this application, you are able to setup a Slack incoming web hook in order to send slack notifications to a channel, notifying the users that an instance has been terminated.
+
+Incoming WebHooks require that you set the SLACK_URL environmental variable as part of your PodSpec. The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
+
+Slack Setup:
+Docs: https://api.slack.com/incoming-webhooks
+Setup: https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
+
+
+Example Pod Spec:
+
+```
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: SLACK_URL
+            value: "https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934"
+```
+
+![Example Slack Notification](http://i.imgur.com/UIUkyHv.png)
