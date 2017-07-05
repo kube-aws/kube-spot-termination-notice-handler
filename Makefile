@@ -1,4 +1,4 @@
-KUBE_VERSION ?= 1.3.3
+KUBE_VERSION ?= 1.6.4
 VERSION ?= 0.9.2
 REPOSITORY ?= mumoshu/kube-spot-termination-notice-handler
 TAG ?= $(KUBE_VERSION)-$(VERSION)
@@ -10,19 +10,19 @@ ENTRYPOINT ?= $(BUILD_ROOT)/entrypoint.sh
 DOCKER_CACHE ?= docker-cache
 
 cross-build:
-	for v in 1.2.{5..6} 1.3.{0..3}; do\
+	for v in 1.6.4 1.7.0; do\
 	  KUBE_VERSION=$$v sh -c 'echo Building am image targeting k8s $$KUBECTL_VERSION';\
 	  KUBE_VERSION=$$v make build ;\
 	done
 
 cross-push:
-	for v in 1.2.{5..6} 1.3.{0..3}; do\
+	for v in 1.6.4 1.7.0; do\
 	  KUBE_VERSION=$$v sh -c 'echo Pushing an image targeting k8s $$KUBECTL_VERSION';\
 	  KUBE_VERSION=$$v make publish ;\
 	done
 
 clean-all:
-	for v in 1.2.{5..6} 1.3.{0..3}; do\
+	for v in 1.6.4 1.7.0; do\
 	  KUBE_VERSION=$$v sh -c 'echo Cleaning assets targeting k8s $$KUBECTL_VERSION';\
 	  KUBE_VERSION=$$v make clean ;\
 	done

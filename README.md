@@ -16,7 +16,9 @@ Using the same version for your Kubernetes cluster and spot-termination-notice-h
 * `mumoshu/spot-termination-notice-handler:1.3.2`
 * `mumoshu/spot-termination-notice-handler:1.3.3`
 * `kylegato/spot-termination-notice-handler:1.5.3`
-* `kylegato/spot-termination-notice-handler:1.5.3-1` (Has Slack notifications feature.)
+* `kylegato/spot-termination-notice-handler:1.5.3-1` (Slack notifications feature is enabled since this version)
+* `mumoshu/spot-termination-notice-handler:1.6.4`
+* `mumoshu/spot-termination-notice-handler:1.7.0`
 
 ## Why use it
 
@@ -43,9 +45,9 @@ Fri Jul 29 07:39:14 UTC 2016: 404
 Fri Jul 29 hh:mm:ss UTC 2016: 200
 ```
 
-## Kubernetes 1.6+
+## Building against a specific version of Kubernetes
 
-Use Dockerfile-1.6 or image kylegato/spot-termination-notice-handler:1.5.3 for kubernetes clusters >=1.6
+Run `KUBE_VERSION=<your disired k8s version> make build` to specify the version number of k8s/kubectl.
 
 ## Slack Notifications
 Introduced in version 0.9.2 of this application, you are able to setup a Slack incoming web hook in order to send slack notifications to a channel, notifying the users that an instance has been terminated.

@@ -1,10 +1,29 @@
-FROM mumoshu/kubectl:%%KUBE_VERSION%%
+FROM alpine:3.4
 
 # Install kubectl
-RUN apk add --update --no-cache curl
+# Note: Latest version may be found on:
+# https://aur.archlinux.org/packages/kubectl-bin/
+ADD https://storage.googleapis.com/kubernetes-release/release/v%%KUBE_VERSION%%/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 
-COPY entrypoint.sh /entrypoint.sh
+ENV HOME=/config
 
-RUN chmod +x /entrypoint.sh
+RUN set -x && \
+    apk add --no-cache curl ca-certificates && \
+    chmod +x /usr/local/bin/kubectl && \
+    \
+    # Create non-root user (with a randomly chosen UID/GUI).
+    adduser kubectl -Du 2342 -h /config && \
+    \
+    # Basic check it works.
+    kubectl version --client
 
-CMD ["/entrypoint.sh"]
+# Copy entrypoint.sh
+COPY entrypoint.sh /config/entrypoint.sh
+
+# Set permissions on the file.
+RUN chown kubectl: /config/entrypoint.sh && \
+    chmod +x /config/entrypoint.sh
+
+USER kubectl
+
+CMD ["/config/entrypoint.sh"]
