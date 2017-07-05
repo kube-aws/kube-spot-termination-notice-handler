@@ -39,6 +39,18 @@ done
 
 echo $(date): ${http_status}
 
+# Notify Slack incoming-webhook
+# Docs: https://api.slack.com/incoming-webhooks
+# Setup: https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
+#
+# You will have to set SLACK_URL as an environment variable via PodSpec.
+# The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
+#
+if [ "${SLACK_URL}" != "" ]; then
+  SLACK_MESSAGE="Spot Termination Detected on node: $NODE_NAME"
+  curl -X POST --data "payload={\"text\": \":warning: ${SLACK_MESSAGE}\"}" ${SLACK_URL}
+fi
+
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
 kubectl drain ${NODE_NAME} --force --ignore-daemonsets
