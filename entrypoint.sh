@@ -23,6 +23,17 @@ if [ "${NODE_NAME}" == "" ]; then
   exit 1
 fi
 
+# Gather some information
+AZ_URL=${AZ_URL:-http://169.254.169.254/latest/meta-data/placement/availability-zone}
+AZ=$(curl -s ${AZ_URL})
+INSTANCE_ID_URL=${INSTANCE_ID_URL:-http://169.254.169.254/latest/meta-data/instance-id}
+INSTANCE_ID=$(curl -s ${INSTANCE_ID_URL})
+if [ -z $CLUSTER ]; then
+  echo "[WARNING] Environment variable CLUSTER has no name set. You can set this to get it reported in the Slack message." 1>&2
+else
+  CLUSTER_INFO=" (${CLUSTER})"
+fi
+
 echo "\`kubectl drain ${NODE_NAME}\` will be executed once a termination notice is made."
 
 POLL_INTERVAL=${POLL_INTERVAL:-5}
@@ -47,7 +58,7 @@ echo $(date): ${http_status}
 # The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
 #
 if [ "${SLACK_URL}" != "" ]; then
-  SLACK_MESSAGE="Spot Termination Detected on node: $NODE_NAME"
+  SLACK_MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, AZ: ${AZ}"
   curl -X POST --data "payload={\"text\": \":warning: ${SLACK_MESSAGE}\"}" ${SLACK_URL}
 fi
 
