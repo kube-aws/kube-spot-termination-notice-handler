@@ -1,11 +1,7 @@
-A Kubernetes DaemonSet to run 1 container per node to periodically polls the [EC2 Spot Instance Termination Notices](https://aws.amazon.com/jp/blogs/aws/new-ec2-spot-instance-termination-notices/) endpoint.
+A Kubernetes DaemonSet to run 1 container per node to periodically polls the [EC2 Spot Instance Termination Notices](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/) endpoint.
 Once a termination notice is received, it will try to gracefully stop all the pods running on the Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing the node is terminated.
 
 ## Installation
-
-### Manual
-
-    $ kubectl create -f spot-termination-notice-handler.daemonset.yaml
 
 ### Helm
 
@@ -17,16 +13,10 @@ A helm chart has been created for this tool, and at time of writing was in the `
 
 Tags denotes Kubernetes/`kubectl` versions.
 Using the same version for your Kubernetes cluster and spot-termination-notice-handler is recommended.
+Note that the `-1` (or similar) is the revision of this tool, in case we need versioning.
 
-* `mumoshu/spot-termination-notice-handler:1.2.5`
-* `mumoshu/spot-termination-notice-handler:1.3.0`
-* `mumoshu/spot-termination-notice-handler:1.3.1`
-* `mumoshu/spot-termination-notice-handler:1.3.2`
-* `mumoshu/spot-termination-notice-handler:1.3.3`
-* `kylegato/spot-termination-notice-handler:1.5.3`
-* `kylegato/spot-termination-notice-handler:1.5.3-1` (Slack notifications feature is enabled since this version)
-* `mumoshu/spot-termination-notice-handler:1.6.4`
-* `mumoshu/spot-termination-notice-handler:1.7.0`
+* `egeland/spot-termination-notice-handler:1.6.8-1`
+* `egeland/spot-termination-notice-handler:1.7.8-1`
 
 ## Why use it
 
@@ -58,7 +48,7 @@ Fri Jul 29 hh:mm:ss UTC 2016: 200
 Run `KUBE_VERSION=<your desired k8s version> make build` to specify the version number of k8s/kubectl.
 
 ## Slack Notifications
-Introduced in version 0.9.2 of this application, you are able to setup a Slack incoming web hook in order to send slack notifications to a channel, notifying the users that an instance has been terminated.
+Introduced in version 0.9.2 of this application (the @mumoshu version), you are able to setup a Slack incoming web hook in order to send slack notifications to a channel, notifying the users that an instance has been terminated.
 
 Incoming WebHooks require that you set the SLACK_URL environmental variable as part of your PodSpec.
 
@@ -90,4 +80,6 @@ Example Pod Spec:
             value: development
 ```
 
-![Example Slack Notification](http://i.imgur.com/UIUkyHv.png) (older version)
+## Credits
+
+This was forked from [@mumoshu's original](https://github.com/mumoshu/kube-spot-termination-notice-handler), and enhanced/simplified.
