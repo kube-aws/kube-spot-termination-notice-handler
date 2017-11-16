@@ -3,6 +3,12 @@
 # How to test:
 #  NAMESPACE=default POD_NAME=kubesh-3976960141-b9b9t ./this_script
 
+# Set VERBOSE=1 to get more output
+VERBOSE=${VERBOSE:-0}
+function verbose () {
+  [[ ${VERBOSE} -eq 1 ]] && return 0 || return 1
+}
+
 echo 'This script polls the "EC2 Spot Instance Termination Notices" endpoint to gracefully stop and then reschedule all the pods running on this Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing this node is terminated.'
 echo 'See https://aws.amazon.com/jp/blogs/aws/new-ec2-spot-instance-termination-notices/ for more information.'
 
@@ -33,11 +39,23 @@ echo "Polling ${NOTICE_URL} every ${POLL_INTERVAL} second(s)"
 
 # To whom it may concern: http://superuser.com/questions/590099/can-i-make-curl-fail-with-an-exitcode-different-than-0-if-the-http-status-code-i
 while http_status=$(curl -o /dev/null -w '%{http_code}' -sL ${NOTICE_URL}); [ ${http_status} -ne 200 ]; do
-  echo $(date): ${http_status}
+  verbose && echo $(date): ${http_status}
   sleep ${POLL_INTERVAL}
 done
 
 echo $(date): ${http_status}
+MESSAGE="Spot Termination Detected on node: $NODE_NAME"
+
+# Notify Hipchat
+# Set the HIPCHAT_ROOM_ID & HIPCHAT_AUTH_TOKEN variables below.
+# Further instructions at https://www.hipchat.com/docs/apiv2/auth
+if [ "${HIPCHAT_AUTH_TOKEN}" != "" ]; then
+  curl -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $HIPCHAT_AUTH_TOKEN" \
+     -X POST \
+     -d "{\"color\": \"purple\", \"message_format\": \"text\", \"message\": \"${MESSAGE}\" }" \
+     https://api.hipchat.com/v2/room/$HIPCHAT_ROOM_ID/notification
+fi
 
 # Notify Slack incoming-webhook
 # Docs: https://api.slack.com/incoming-webhooks
@@ -47,8 +65,7 @@ echo $(date): ${http_status}
 # The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
 #
 if [ "${SLACK_URL}" != "" ]; then
-  SLACK_MESSAGE="Spot Termination Detected on node: $NODE_NAME"
-  curl -X POST --data "payload={\"text\": \":warning: ${SLACK_MESSAGE}\"}" ${SLACK_URL}
+  curl -X POST --data "payload={\"text\": \":warning: ${MESSAGE}\"}" ${SLACK_URL}
 fi
 
 # Drain the node.
