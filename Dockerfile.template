@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.6
 
 # Install kubectl
 # Note: Latest version may be found on:
