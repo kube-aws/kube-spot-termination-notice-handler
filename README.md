@@ -1,28 +1,27 @@
-A Kubernetes DaemonSet to run 1 container per node to periodically polls the [EC2 Spot Instance Termination Notices](https://aws.amazon.com/jp/blogs/aws/new-ec2-spot-instance-termination-notices/) endpoint.
+A Kubernetes DaemonSet to run 1 container per node to periodically polls the [EC2 Spot Instance Termination Notices](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/) endpoint.
 Once a termination notice is received, it will try to gracefully stop all the pods running on the Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing the node is terminated.
 
-## Usage
+## Installation
 
-    $ kubectl create -f spot-termination-notice-handler.daemonset.yaml
+### Helm
 
-## Avaiable docker images/tags
+A helm chart has been created for this tool, and at time of writing was in the `incubator` repository.
+
+    $ helm install incubator/kube-spot-termination-notice-handler
+
+## Available docker images/tags
 
 Tags denotes Kubernetes/`kubectl` versions.
 Using the same version for your Kubernetes cluster and spot-termination-notice-handler is recommended.
+Note that the `-1` (or similar) is the revision of this tool, in case we need versioning.
 
-* `mumoshu/spot-termination-notice-handler:1.2.5`
-* `mumoshu/spot-termination-notice-handler:1.3.0`
-* `mumoshu/spot-termination-notice-handler:1.3.1`
-* `mumoshu/spot-termination-notice-handler:1.3.2`
-* `mumoshu/spot-termination-notice-handler:1.3.3`
-* `kylegato/spot-termination-notice-handler:1.5.3`
-* `kylegato/spot-termination-notice-handler:1.5.3-1` (Slack notifications feature is enabled since this version)
-* `mumoshu/spot-termination-notice-handler:1.6.4`
-* `mumoshu/spot-termination-notice-handler:1.7.0`
+* `egeland/spot-termination-notice-handler:1.6.8-1`
+* `egeland/spot-termination-notice-handler:1.7.8-1`
+* `egeland/spot-termination-notice-handler:1.8.1-1`
 
 ## Why use it
 
-  * So that your kubernetes jobs backed by spot instances can keep running on another instances(typically on-demand instances)
+  * So that your kubernetes jobs backed by spot instances can keep running on another instances (typically on-demand instances)
 
 ## How it works
 
@@ -47,12 +46,12 @@ Fri Jul 29 hh:mm:ss UTC 2016: 200
 
 ## Building against a specific version of Kubernetes
 
-Run `KUBE_VERSION=<your disired k8s version> make build` to specify the version number of k8s/kubectl.
+Run `KUBE_VERSION=<your desired k8s version> make build` to specify the version number of k8s/kubectl.
 
 ## Slack Notifications
-Introduced in version 0.9.2 of this application, you are able to setup a Slack incoming web hook in order to send slack notifications to a channel, notifying the users that an instance has been terminated.
+Introduced in version 0.9.2 of this application (the @mumoshu version), you are able to setup a Slack incoming web hook in order to send slack notifications to a channel, notifying the users that an instance has been terminated.
 
-Incoming WebHooks require that you set the SLACK_URL environmental variable as part of your PodSpec. 
+Incoming WebHooks require that you set the SLACK_URL environmental variable as part of your PodSpec.
 
 The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
 
@@ -60,6 +59,9 @@ Slack Setup:
 * Docs: https://api.slack.com/incoming-webhooks
 * Setup: https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
 
+
+Show where things are happening by setting the `CLUSTER` environment variable to whatever you call your cluster.
+Very handy if you have several clusters that report to the same Slack channel.
 
 Example Pod Spec:
 
@@ -75,6 +77,10 @@ Example Pod Spec:
                 fieldPath: metadata.namespace
           - name: SLACK_URL
             value: "https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934"
+          - name: CLUSTER
+            value: development
 ```
 
-![Example Slack Notification](http://i.imgur.com/UIUkyHv.png)
+## Credits
+
+This was forked from [@mumoshu's original](https://github.com/mumoshu/kube-spot-termination-notice-handler), and enhanced/simplified.

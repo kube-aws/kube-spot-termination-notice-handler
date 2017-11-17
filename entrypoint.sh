@@ -10,7 +10,7 @@ function verbose () {
 }
 
 echo 'This script polls the "EC2 Spot Instance Termination Notices" endpoint to gracefully stop and then reschedule all the pods running on this Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing this node is terminated.'
-echo 'See https://aws.amazon.com/jp/blogs/aws/new-ec2-spot-instance-termination-notices/ for more information.'
+echo 'See https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/ for more information.'
 
 if [ "${NAMESPACE}" == "" ]; then
   echo '[ERROR] Environment variable `NAMESPACE` has no value set. You must set it via PodSpec like described in http://stackoverflow.com/a/34418819' 1>&2
@@ -29,6 +29,17 @@ if [ "${NODE_NAME}" == "" ]; then
   exit 1
 fi
 
+# Gather some information
+AZ_URL=${AZ_URL:-http://169.254.169.254/latest/meta-data/placement/availability-zone}
+AZ=$(curl -s ${AZ_URL})
+INSTANCE_ID_URL=${INSTANCE_ID_URL:-http://169.254.169.254/latest/meta-data/instance-id}
+INSTANCE_ID=$(curl -s ${INSTANCE_ID_URL})
+if [ -z $CLUSTER ]; then
+  echo "[WARNING] Environment variable CLUSTER has no name set. You can set this to get it reported in the Slack message." 1>&2
+else
+  CLUSTER_INFO=" (${CLUSTER})"
+fi
+
 echo "\`kubectl drain ${NODE_NAME}\` will be executed once a termination notice is made."
 
 POLL_INTERVAL=${POLL_INTERVAL:-5}
@@ -44,7 +55,7 @@ while http_status=$(curl -o /dev/null -w '%{http_code}' -sL ${NOTICE_URL}); [ ${
 done
 
 echo $(date): ${http_status}
-MESSAGE="Spot Termination Detected on node: $NODE_NAME"
+MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, AZ: ${AZ}"
 
 # Notify Hipchat
 # Set the HIPCHAT_ROOM_ID & HIPCHAT_AUTH_TOKEN variables below.
