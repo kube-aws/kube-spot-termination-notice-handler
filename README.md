@@ -87,6 +87,6 @@ kube-spot-termination-notice-handler is a collaborative project to unify [@mumos
 
 The project is currently maintained by:
 
-- @edeland
+- @egeland
 - @kylegato
 - @mumoshu
