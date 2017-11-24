@@ -83,4 +83,10 @@ Example Pod Spec:
 
 ## Credits
 
-This was forked from [@mumoshu's original](https://github.com/mumoshu/kube-spot-termination-notice-handler), and enhanced/simplified.
+kube-spot-termination-notice-handler is a collaborative project to unify [@mumoshu and @kylegato's initial work](https://github.com/mumoshu/kube-spot-termination-notice-handler) and [@egeland's fork with various enhancements and simplifications](https://github.com/egeland/kube-spot-termination-notice-handler).
+
+The project is currently maintained by:
+
+- @edeland
+- @kylegato
+- @mumoshu
