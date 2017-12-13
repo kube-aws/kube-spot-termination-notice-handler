@@ -76,7 +76,8 @@ fi
 # The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
 #
 if [ "${SLACK_URL}" != "" ]; then
-  curl -X POST --data "payload={\"text\": \":warning: ${MESSAGE}\"}" ${SLACK_URL}
+  color="danger"
+  curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"$MESSAGE\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" ${SLACK_URL}
 fi
 
 # Drain the node.
