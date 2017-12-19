@@ -16,7 +16,7 @@ Using the same version for your Kubernetes cluster and spot-termination-notice-h
 Note that the `-1` (or similar) is the revision of this tool, in case we need versioning.
 
 * `egeland/spot-termination-notice-handler:1.6.8-1`
-* `egeland/spot-termination-notice-handler:1.7.8-1`
+* `egeland/spot-termination-notice-handler:1.7.11-1`
 * `egeland/spot-termination-notice-handler:1.8.1-1`
 
 ## Why use it
