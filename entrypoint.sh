@@ -80,6 +80,19 @@ if [ "${SLACK_URL}" != "" ]; then
   curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"$MESSAGE\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" ${SLACK_URL}
 fi
 
+# Notify Sematext Cloud incoming-webhook
+# Docs: https://sematext.com/docs/events/#adding-events
+# Setup: app
+#
+# You will have to set SEMATEXT_URL as an environment variable via PodSpec.
+# The URL should look something like: 
+# - USA: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
+# - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
+if [ "${SEMATEXT_URL}" != "" ]; then
+  curl -X POST --data "{\"message\":\"$MESSAGE\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" ${SEMATEXT_URL}
+fi
+
+
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
 kubectl drain ${NODE_NAME} --force --ignore-daemonsets

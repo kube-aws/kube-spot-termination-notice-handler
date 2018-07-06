@@ -82,6 +82,38 @@ Example Pod Spec:
             value: development
 ```
 
+## Sematext Cloud Event Notifications
+
+The [Sematext Cloud](https://sematext.com/cloud) event URL is different for Europe and USA and includes the application token for your monitored App.
+
+* USA URL: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
+* Europe URL: https://event-receiver.eu.sematext.com/APPLICATION_TOKEN/event
+
+Sematext Setup:
+* You get the APPLICATION_TOKEN when you create a [Docker monitoring app](https://sematext.com/docker/) in Sematext Cloud. 
+* API Docs: https://sematext.com/docs/events/#adding-events
+
+Show where things are happening by setting the `CLUSTER` environment variable to whatever you call your cluster.
+Very handy if you have several clusters that report to the same Slack channel.
+
+Example Pod Spec:
+
+```
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: SEMATEXT_URL
+            value: "https://event-receiver.sematext.com/APPLICATION_TOKEN/event"
+          - name: CLUSTER
+            value: development
+```
+
 ## Credits
 
 kube-spot-termination-notice-handler is a collaborative project to unify [@mumoshu and @kylegato's initial work](https://github.com/mumoshu/kube-spot-termination-notice-handler) and [@egeland's fork with various enhancements and simplifications](https://github.com/egeland/kube-spot-termination-notice-handler).
