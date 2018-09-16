@@ -85,7 +85,7 @@ fi
 # Setup: app
 #
 # You will have to set SEMATEXT_URL as an environment variable via PodSpec.
-# The URL should look something like: 
+# The URL should look something like:
 # - USA: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 # - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 if [ "${SEMATEXT_URL}" != "" ]; then
@@ -95,7 +95,7 @@ fi
 
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
-kubectl drain ${NODE_NAME} --force --ignore-daemonsets
+kubectl drain ${NODE_NAME} --force --ignore-daemonsets --delete-local-data
 
 # Sleep for 200 seconds to prevent this script from looping.
 # The instance should be terminated by the end of the sleep.
