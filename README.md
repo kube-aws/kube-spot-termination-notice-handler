@@ -15,10 +15,8 @@ Tags denotes Kubernetes/`kubectl` versions.
 Using the same version for your Kubernetes cluster and spot-termination-notice-handler is recommended.
 Note that the `-1` (or similar) is the revision of this tool, in case we need versioning.
 
-* `egeland/kube-spot-termination-notice-handler:1.6.8-1`
-* `egeland/kube-spot-termination-notice-handler:1.7.11-1`
-* `egeland/kube-spot-termination-notice-handler:1.8.5-1`
-* `egeland/kube-spot-termination-notice-handler:1.9.0-1`
+* `kubeaws/kube-spot-termination-notice-handler:1.8.5-1`
+* `kubeaws/kube-spot-termination-notice-handler:1.9.0-1`
 
 ## Why use it
 
@@ -90,7 +88,7 @@ The [Sematext Cloud](https://sematext.com/cloud) event URL is different for Euro
 * Europe URL: https://event-receiver.eu.sematext.com/APPLICATION_TOKEN/event
 
 Sematext Setup:
-* You get the APPLICATION_TOKEN when you create a [Docker monitoring app](https://sematext.com/docker/) in Sematext Cloud. 
+* You get the APPLICATION_TOKEN when you create a [Docker monitoring app](https://sematext.com/docker/) in Sematext Cloud.
 * API Docs: https://sematext.com/docs/events/#adding-events
 
 Show where things are happening by setting the `CLUSTER` environment variable to whatever you call your cluster.
