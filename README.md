@@ -17,6 +17,7 @@ Note that the `-1` (or similar) is the revision of this tool, in case we need ve
 
 * `kubeaws/kube-spot-termination-notice-handler:1.8.5-1`
 * `kubeaws/kube-spot-termination-notice-handler:1.9.0-1`
+* `kubeaws/kube-spot-termination-notice-handler:1.10.8-1`
 
 ## Why use it
 
