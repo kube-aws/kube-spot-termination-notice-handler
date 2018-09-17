@@ -1,6 +1,6 @@
-FROM alpine:3.6
+FROM alpine:3.8
 
-ARG KUBE_VERSION=1.9.0
+ARG KUBE_VERSION=1.10.8
 ENV HOME=/srv
 WORKDIR /srv
 
