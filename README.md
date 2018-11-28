@@ -65,6 +65,9 @@ Slack Setup:
 Show where things are happening by setting the `CLUSTER` environment variable to whatever you call your cluster.
 Very handy if you have several clusters that report to the same Slack channel.
 
+## Using ASG for instances
+Add "ASG_NAME" environment variable in case you want the handler to detach the instance when termination notice is available. DesiredCapacity will not be reduced while detaching the instance, which will cause the replacement spot node to be launched.
+
 Example Pod Spec:
 
 ```

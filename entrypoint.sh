@@ -32,6 +32,7 @@ fi
 # Gather some information
 AZ_URL=${AZ_URL:-http://169.254.169.254/latest/meta-data/placement/availability-zone}
 AZ=$(curl -s ${AZ_URL})
+EC2_REGION="`echo \"$AZ\" | sed 's/[a-z]$//'`"
 INSTANCE_ID_URL=${INSTANCE_ID_URL:-http://169.254.169.254/latest/meta-data/instance-id}
 INSTANCE_ID=$(curl -s ${INSTANCE_ID_URL})
 if [ -z $CLUSTER ]; then
@@ -56,6 +57,14 @@ done
 
 echo $(date): ${http_status}
 MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, AZ: ${AZ}"
+
+# If ASG_NAME is provided, detach the instance from ASG as soon as termination notice is available
+# This will stop new connections to this node, and make ASG launch the replacement node
+if [ "${ASG_NAME}" != "" ]; then
+  echo "Detaching INSTANCE ${INSTANCE_ID} FROM ASG ${ASG_NAME} and Region ${EC2_REGION}"
+  aws autoscaling detach-instances --instance-ids $INSTANCE_ID --auto-scaling-group-name $ASG_NAME --no-should-decrement-desired-capacity --region $EC2_REGION
+  echo "Detach done!"
+fi
 
 # Notify Hipchat
 # Set the HIPCHAT_ROOM_ID & HIPCHAT_AUTH_TOKEN variables below.
