@@ -113,7 +113,17 @@ Example Pod Spec:
             value: "https://event-receiver.sematext.com/APPLICATION_TOKEN/event"
           - name: CLUSTER
             value: development
+          - name: DETACH_ASG
+            value: "true"
 ```
+
+## AutoScaling Detachment
+
+**This feature currently only supports simple autoscaling - no spot fleet or similar.**
+
+If you set the environment variable `DETACH_ASG` to _any value other than_ `false`, the handler will detach the instance from the ASG, which may bring a replacement instance up sooner.
+
+The autoscaling group name is automatically detected by the handler.
 
 ## Credits
 

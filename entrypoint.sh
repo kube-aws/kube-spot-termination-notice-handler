@@ -29,11 +29,20 @@ if [ "${NODE_NAME}" == "" ]; then
   exit 1
 fi
 
+# Do we detach the instance from the AutoScaling Group? Defaults to not do so.
+DETACH_ASG=${DETACH_ASG:-false}
+
 # Gather some information
 AZ_URL=${AZ_URL:-http://169.254.169.254/latest/meta-data/placement/availability-zone}
 AZ=$(curl -s ${AZ_URL})
+REGION=$(echo ${AZ} | sed 's/[a-z]$//')
 INSTANCE_ID_URL=${INSTANCE_ID_URL:-http://169.254.169.254/latest/meta-data/instance-id}
 INSTANCE_ID=$(curl -s ${INSTANCE_ID_URL})
+
+if [ "${DETACH_ASG}" != "false" ]; then
+  ASG_NAME=$(aws --output text --region ${REGION} autoscaling describe-auto-scaling-instances --instance-ids ${INSTANCE_ID} |awk '{print $2}')
+fi
+
 if [ -z $CLUSTER ]; then
   echo "[WARNING] Environment variable CLUSTER has no name set. You can set this to get it reported in the Slack message." 1>&2
 else
@@ -90,6 +99,13 @@ fi
 # - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 if [ "${SEMATEXT_URL}" != "" ]; then
   curl -X POST --data "{\"message\":\"$MESSAGE\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" ${SEMATEXT_URL}
+fi
+
+# Detach from autoscaling group, which will cause faster replacement
+# We do this in parallel with the drain (see the & at the end of the command).
+if [ "${DETACH_ASG}" != "false" -a "${ASG_NAME}" != "" ]; then
+  verbose && echo $(date): detaching instance from AutoScaling Group ${ASG_NAME}
+  aws --region ${REGION} autoscaling detach-instances --instance-ids ${INSTANCE_ID} --auto-scaling-group-name ${ASG_NAME} --no-should-decrement-desired-capacity &
 fi
 
 
