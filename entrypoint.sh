@@ -111,7 +111,8 @@ fi
 
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
-kubectl drain ${NODE_NAME} --force --ignore-daemonsets --delete-local-data --grace-period=120
+GRACE_PERIOD=${GRACE_PERIOD:-120}
+kubectl drain ${NODE_NAME} --force --ignore-daemonsets --delete-local-data --grace-period=${GRACE_PERIOD}
 
 # Sleep for 200 seconds to prevent this script from looping.
 # The instance should be terminated by the end of the sleep.
