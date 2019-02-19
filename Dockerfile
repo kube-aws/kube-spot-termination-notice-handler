@@ -16,5 +16,6 @@ COPY entrypoint.sh .
 # Set permissions on the file.
 RUN chmod +x entrypoint.sh
 
+USER nobody
 
 CMD ["/srv/entrypoint.sh"]
