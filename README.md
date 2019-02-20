@@ -7,7 +7,7 @@ Once a termination notice is received, it will try to gracefully stop all the po
 
 A helm chart has been created for this tool, and at time of writing was in the `stable` repository.
 
-    $ helm install stable/kube-spot-termination-notice-handler
+    $ helm install stable/k8s-spot-termination-handler
 
 ## Available docker images/tags
 
