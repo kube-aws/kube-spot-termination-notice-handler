@@ -12,6 +12,7 @@ RUN curl -f -s -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernet
 
 # Copy entrypoint.sh
 COPY entrypoint.sh .
+COPY handlers .
 
 # Set permissions on the file.
 RUN chmod +x entrypoint.sh
