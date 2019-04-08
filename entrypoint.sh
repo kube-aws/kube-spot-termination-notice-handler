@@ -39,6 +39,8 @@ AZ=$(curl -s "${AZ_URL}")
 REGION=$(echo "${AZ}" | sed 's/[a-z]$//')
 INSTANCE_ID_URL=${INSTANCE_ID_URL:-http://169.254.169.254/latest/meta-data/instance-id}
 INSTANCE_ID=$(curl -s "${INSTANCE_ID_URL}")
+INSTANCE_TYPE_URL=${INSTANCE_TYPE_URL:-http://169.254.169.254/latest/meta-data/instance-type}
+INSTANCE_TYPE=$(curl -s "${INSTANCE_TYPE_URL}")
 
 if [ "${DETACH_ASG}" != "false" ]; then
   ASG_NAME=$(aws --output text --region "${REGION}" autoscaling describe-auto-scaling-instances --instance-ids "${INSTANCE_ID}" |awk '{print $2}')
@@ -65,7 +67,7 @@ while http_status=$(curl -o /dev/null -w '%{http_code}' -sL "${NOTICE_URL}"); [ 
 done
 
 echo "$(date): ${http_status}"
-MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, AZ: ${AZ}"
+MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, Instance Type: ${INSTANCE_TYPE}, AZ: ${AZ}"
 
 # Notify Hipchat
 # Set the HIPCHAT_ROOM_ID & HIPCHAT_AUTH_TOKEN variables below.
@@ -87,7 +89,7 @@ fi
 #
 if [ "${SLACK_URL}" != "" ]; then
   color="danger"
-  curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
+  curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
 fi
 
 # Notify Email address with a Google account
@@ -109,7 +111,7 @@ fi
 # - USA: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 # - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 if [ "${SEMATEXT_URL}" != "" ]; then
-  curl -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
+  curl -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
 fi
 
 # Detach from autoscaling group, which will cause faster replacement
