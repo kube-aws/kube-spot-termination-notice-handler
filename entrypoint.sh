@@ -43,7 +43,7 @@ INSTANCE_TYPE_URL=${INSTANCE_TYPE_URL:-http://169.254.169.254/latest/meta-data/i
 INSTANCE_TYPE=$(curl -s "${INSTANCE_TYPE_URL}")
 
 if [ "${DETACH_ASG}" != "false" ]; then
-  ASG_NAME=$(aws --output text --region "${REGION}" autoscaling describe-auto-scaling-instances --instance-ids "${INSTANCE_ID}" | awk '$1 == "AUTOSCALINGINSTANCES" {print $2}')
+  ASG_NAME=$(aws --output text --query 'AutoScalingInstances[0].AutoScalingGroupName' --region "${REGION}" autoscaling describe-auto-scaling-instances --instance-ids "${INSTANCE_ID}")
 fi
 
 if [ -z "$CLUSTER" ]; then
