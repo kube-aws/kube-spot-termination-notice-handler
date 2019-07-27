@@ -66,8 +66,24 @@ while http_status=$(curl -o /dev/null -w '%{http_code}' -sL "${NOTICE_URL}"); [ 
   sleep "${POLL_INTERVAL}"
 done
 
+# Similar Worker Count
+# For added confidence that terminated worker nodes are being replaced, we can add a count of similarly-tagged EC2 instances to our message
+# Enable and filter the query by setting SWC_TAG_NAME, e.g. "Name", and SWC_TAG_VALUES, e.g. "eks-worker-spot,eks-worker-ondemand"
+# Note: a spot instance remains in "running" state throughout the termination notice period, after which the shutdown signal is sent
+SWC_TAG_NAME=${SWC_TAG_NAME:-""}
+SWC_TAG_VALUES=${SWC_TAG_VALUES:-""}
+SWC_TIMEOUT=${SWC_TIMEOUT:-5}
+SWC_MESSAGE="Disabled"
+if [ "${SWC_TAG_NAME}" != "" ] && [ "${SWC_TAG_VALUES}" != "" ]; then
+  SWC_COUNT=$(aws ec2 --cli-read-timeout $SWC_TIMEOUT --output text --query "Reservations[*].Instances[*] | length(@)" --region $REGION describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:$SWC_TAG_NAME,Values=$SWC_TAG_VALUES" 2>/dev/null)
+  case $SWC_COUNT in
+    ''|*[!0-9]*) SWC_MESSAGE="Failed" ;;
+    *) SWC_MESSAGE="$((SWC_COUNT-1))" ;;
+  esac
+fi
+
 echo "$(date): ${http_status}"
-MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, Instance Type: ${INSTANCE_TYPE}, AZ: ${AZ}"
+MESSAGE="Spot Termination${CLUSTER_INFO}: ${NODE_NAME}, Instance: ${INSTANCE_ID}, Instance Type: ${INSTANCE_TYPE}, AZ: ${AZ}, Surviving Worker Count: ${SWC_MESSAGE}"
 
 # Notify Hipchat
 # Set the HIPCHAT_ROOM_ID & HIPCHAT_AUTH_TOKEN variables below.
@@ -89,7 +105,7 @@ fi
 #
 if [ "${SLACK_URL}" != "" ]; then
   color="danger"
-  curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
+  curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true},{\"title\":\"Surviving Worker Count\",\"value\":\"${SWC_MESSAGE}\",\"short\":true}]}]}" "${SLACK_URL}"
 fi
 
 # Notify Email address with a Google account
@@ -111,7 +127,7 @@ fi
 # - USA: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 # - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 if [ "${SEMATEXT_URL}" != "" ]; then
-  curl -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
+  curl -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"Surviving Instance Count\":\"${SWC_MESSAGE}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
 fi
 
 # Detach from autoscaling group, which will cause faster replacement
