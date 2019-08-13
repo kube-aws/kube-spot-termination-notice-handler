@@ -56,6 +56,8 @@ Introduced in version 0.9.2 of this application (the @mumoshu version), you are 
 
 Incoming WebHooks require that you set the SLACK_URL environmental variable as part of your PodSpec.
 
+You can also set SLACK_CHANNEL to send message to different slack channel insisted of default slack webhook url's channel.
+
 The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
 
 Slack Setup:
@@ -80,6 +82,8 @@ Example Pod Spec:
                 fieldPath: metadata.namespace
           - name: SLACK_URL
             value: "https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934"
+          - name: SLACK_CHANNEL
+          - value: "#devops"
           - name: CLUSTER
             value: development
 ```
