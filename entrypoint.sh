@@ -111,7 +111,7 @@ if [ "${HANGOUTS_URL}" != "" ]; then
   curl -H "Content-Type: application/json" \
   -X POST \
   -d "{\"text\": \"${MESSAGE}\"}" \
-  "${HANGOUTS_URL}"
+  -s "${HANGOUTS_URL}"
 fi
 
 # Notify Sematext Cloud incoming-webhook
