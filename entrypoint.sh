@@ -102,6 +102,18 @@ if [ "${GMAIL_USER}" != "" ]; then
                   --cluster-name "${CLUSTER_INFO}"
 fi
 
+# Notify Hangouts Chat
+# Docs: https://developers.google.com/hangouts/chat
+#
+# You will have to set HANGOUTS_URL as an environment variable via PodSpec.
+# The URL should look something like: https://chat.googleapis.com/v1/spaces/AAH8g98/messages?key=AIzaSyDdI0vySjMm&token=jis_B3skhm3mrADK3HwjV
+if [ "${HANGOUTS_URL}" != "" ]; then
+  curl -H "Content-Type: application/json" \
+  -X POST \
+  -d "{\"text\": \"${MESSAGE}\"}" \
+  "${HANGOUTS_URL}"
+fi
+
 # Notify Sematext Cloud incoming-webhook
 # Docs: https://sematext.com/docs/events/#adding-events
 # Setup: app
