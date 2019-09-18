@@ -76,6 +76,7 @@ if [ "${HIPCHAT_AUTH_TOKEN}" != "" ]; then
   curl -H "Content-Type: application/json" \
      -H "Authorization: Bearer $HIPCHAT_AUTH_TOKEN" \
      -X POST \
+     -s \
      -d "{\"color\": \"purple\", \"message_format\": \"text\", \"message\": \"${MESSAGE}\" }" \
      "https://api.hipchat.com/v2/room/${HIPCHAT_ROOM_ID}/notification"
 fi
@@ -90,7 +91,7 @@ fi
 
 if [ "${SLACK_URL}" != "" ]; then
   color="danger"
-  curl -X POST --data "payload={\"channel\":\"${SLACK_CHANNEL}\",\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
+  curl -s -X POST --data "payload={\"channel\":\"${SLACK_CHANNEL}\",\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
 fi
 
 # Notify Email address with a Google account
@@ -103,6 +104,18 @@ if [ "${GMAIL_USER}" != "" ]; then
                   --cluster-name "${CLUSTER_INFO}"
 fi
 
+# Notify Hangouts Chat
+# Docs: https://developers.google.com/hangouts/chat
+#
+# You will have to set HANGOUTS_URL as an environment variable via PodSpec.
+# The URL should look something like: https://chat.googleapis.com/v1/spaces/AAH8g98/messages?key=AIzaSyDdI0vySjMm&token=jis_B3skhm3mrADK3HwjV
+if [ "${HANGOUTS_URL}" != "" ]; then
+  curl -H "Content-Type: application/json" \
+  -X POST \
+  -d "{\"text\": \"${MESSAGE}\"}" \
+  -s "${HANGOUTS_URL}"
+fi
+
 # Notify Sematext Cloud incoming-webhook
 # Docs: https://sematext.com/docs/events/#adding-events
 # Setup: app
@@ -112,7 +125,7 @@ fi
 # - USA: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 # - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 if [ "${SEMATEXT_URL}" != "" ]; then
-  curl -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
+  curl -s -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
 fi
 
 # Detach from autoscaling group, which will cause faster replacement
