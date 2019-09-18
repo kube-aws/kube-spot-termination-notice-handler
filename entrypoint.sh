@@ -76,6 +76,7 @@ if [ "${HIPCHAT_AUTH_TOKEN}" != "" ]; then
   curl -H "Content-Type: application/json" \
      -H "Authorization: Bearer $HIPCHAT_AUTH_TOKEN" \
      -X POST \
+     -s \
      -d "{\"color\": \"purple\", \"message_format\": \"text\", \"message\": \"${MESSAGE}\" }" \
      "https://api.hipchat.com/v2/room/${HIPCHAT_ROOM_ID}/notification"
 fi
@@ -89,7 +90,7 @@ fi
 #
 if [ "${SLACK_URL}" != "" ]; then
   color="danger"
-  curl -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
+  curl -s -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
 fi
 
 # Notify Email address with a Google account
@@ -111,7 +112,7 @@ fi
 # - USA: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 # - EUROPE: https://event-receiver.sematext.com/APPLICATION_TOKEN/event
 if [ "${SEMATEXT_URL}" != "" ]; then
-  curl -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
+  curl -s -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
 fi
 
 # Detach from autoscaling group, which will cause faster replacement
