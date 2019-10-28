@@ -87,10 +87,11 @@ fi
 #
 # You will have to set SLACK_URL as an environment variable via PodSpec.
 # The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
-#
+# SLACK_CHANNEL variable will send alert to specific slack channel. if its empty then it will go to default webhook channel
+
 if [ "${SLACK_URL}" != "" ]; then
   color="danger"
-  curl -s -X POST --data "payload={\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
+  curl -s -X POST --data "payload={\"channel\":\"${SLACK_CHANNEL}\",\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${SLACK_URL}"
 fi
 
 # Notify Email address with a Google account
