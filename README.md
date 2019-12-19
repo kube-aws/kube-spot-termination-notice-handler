@@ -122,6 +122,39 @@ Example Pod Spec:
             value: "true"
 ```
 
+## Wechat Notifications
+
+Incoming WebHooks require that you set the WECHAT_URL and WECHAT_KEY environmental variables as part of your PodSpec.
+
+The URL should look something like: https://pushbear.ftqq.com/sub?key=3488-876437815599e06514b2bbc3864bc96a&text=SpotTermination&desp=SpotInstanceDetainInfo
+
+Wechat Setup:
+* You get the WECHAT_KEY by [pushbear](http://pushbear.ftqq.com/admin/)
+* You bind WECHAT_KEY to a QR code after you create a [Wechat Service account](https://mp.weixin.qq.com/?lang=en_US).
+* API Docs: http://pushbear.ftqq.com/admin/ ; https://mp.weixin.qq.com/?lang=en_US
+
+Example Pod Spec:
+
+```
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: WECHAT_URL
+            value: "https://pushbear.ftqq.com/sub"
+          - name: WECHAT_KEY
+            value: "3488-876437815599e06514b2bbc3864bc96a"
+          - name: CLUSTER
+            value: development
+          - name: DETACH_ASG
+            value: "true"
+```
+
 ## AutoScaling Detachment
 
 **This feature currently only supports simple autoscaling - no spot fleet or similar.**
