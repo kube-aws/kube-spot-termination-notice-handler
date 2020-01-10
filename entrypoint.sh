@@ -128,6 +128,18 @@ if [ "${SEMATEXT_URL}" != "" ]; then
   curl -s -X POST --data "{\"message\":\"${MESSAGE}\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\",\"Instance Type\":\"${INSTANCE_TYPE}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" "${SEMATEXT_URL}"
 fi
 
+# Notify Wechat incoming-webhook
+# Docs: http://pushbear.ftqq.com/admin/#/api
+# Setup: app
+#
+# You will have to set Wechat as an environment variable via PodSpec.
+# The URL should look something like:
+# - China: https://pushbear.ftqq.com/sub?key=3488-876437815599e06514b2bbc3864bc96a&text=SpotTermination&desp=SpotInstanceDetainInfo
+if [ "${WECHAT_URL}" != "" ]; then
+  desp=`echo "$MESSAGE" | sed s/[[:space:]]//g`
+  curl -s "${WECHAT_URL}?key=${WECHAT_KEY}&text=SpotTermination&desp=${desp}"
+fi
+
 # Detach from autoscaling group, which will cause faster replacement
 # We do this in parallel with the drain (see the & at the end of the command).
 if [ "${DETACH_ASG}" != "false" ] && [ "${ASG_NAME}" != "" ]; then
