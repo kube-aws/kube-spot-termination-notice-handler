@@ -144,11 +144,13 @@ fi
 # Docs: https://grafana.com/docs/grafana/latest/reference/annotations/
 #
 # You will have to set GRAFANA_URL and GRAFANA_API_KEY as an environment variables via PodSpec.
-curl -X POST \
-  --data "{\"text\": \"${MESSAGE}\", \"tags\": [\"cluster${CLUSTER_INFO}\", \"spot_termination\"]}" \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -H "Content-Type: application/json" \
-  -s "${GRAFANA_URL}/api/annotations"
+if [ "${GRAFANA_URL} != "" ]; then
+  curl -X POST \
+    --data "{\"text\": \"${MESSAGE}\", \"tags\": [\"cluster${CLUSTER_INFO}\", \"spot_termination\"]}" \
+    -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+    -H "Content-Type: application/json" \
+    -s "${GRAFANA_URL}/api/annotations"
+fi
 
 # Detach from autoscaling group, which will cause faster replacement
 # We do this in parallel with the drain (see the & at the end of the command).
