@@ -144,7 +144,7 @@ fi
 # Docs: https://grafana.com/docs/grafana/latest/reference/annotations/
 #
 # You will have to set GRAFANA_URL and GRAFANA_API_KEY as an environment variables via PodSpec.
-if [ "${GRAFANA_URL} != "" ]; then
+if [ "${GRAFANA_URL}" != "" ]; then
   curl -X POST \
     --data "{\"text\": \"${MESSAGE}\", \"tags\": [\"cluster${CLUSTER_INFO}\", \"spot_termination\"]}" \
     -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
