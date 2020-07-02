@@ -121,6 +121,10 @@ if [ "${DETACH_ASG}" != "false" ] && [ "${ASG_NAME}" != "" ]; then
   aws --region "${REGION}" autoscaling detach-instances --instance-ids "${INSTANCE_ID}" --auto-scaling-group-name "${ASG_NAME}" --no-should-decrement-desired-capacity &
 fi
 
+# Taint the node
+# https://kubernetes.io/docs/concepts/configuration/taint-and-toleration
+kubectl taint nodes "${NODE_NAME}" spot-termination=true:NoSchedule
+kubectl taint nodes "${NODE_NAME}" spot-termination=true:NoExecute
 
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
