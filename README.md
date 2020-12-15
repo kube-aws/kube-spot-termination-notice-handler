@@ -1,6 +1,31 @@
 A Kubernetes DaemonSet to run 1 container per node to periodically polls the [EC2 Spot Instance Termination Notices](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/) endpoint.
 Once a termination notice is received, it will try to gracefully stop all the pods running on the Kubernetes node, up to 2 minutes before the EC2 Spot Instance backing the node is terminated.
 
+## BombBomb Fork
+
+### Making Modifications
+
+* Check out a new branch.
+* Increment the version in `version.txt`.
+* Build using the script below.
+
+```sh
+VERSION=$(<version.txt)
+docker build . -t docker-private.bombbomb.io/kube-spot-termination-notice-handler:$VERSION
+```
+
+* PR into master.
+* Tag the commit and push the tag using.
+
+```sh
+git tag v$VERSION
+git push origin --tags
+```
+
+* Push to nexus using `docker push -t docker-private.bombbomb.io/kube-spot-termination-notice-handler:$VERSION`.
+* Deploy new tag via `infrastructure-as-code` project in lighthouse kubernetes configs.
+* * Use the `docker.bombbomb.io` host when deploying to kubernetes. `docker-private.bombbomb.io` is for pushing only.
+
 ## Installation
 
 ### Helm
