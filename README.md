@@ -22,7 +22,7 @@ git tag v$VERSION
 git push origin --tags
 ```
 
-* Push to nexus using `docker push -t docker-private.bombbomb.io/kube-spot-termination-notice-handler:$VERSION`.
+* Push to nexus using `docker push docker-private.bombbomb.io/kube-spot-termination-notice-handler:$VERSION`.
 * Deploy new tag via `infrastructure-as-code` project in lighthouse kubernetes configs.
 * * Use the `docker.bombbomb.io` host when deploying to kubernetes. `docker-private.bombbomb.io` is for pushing only.
 
