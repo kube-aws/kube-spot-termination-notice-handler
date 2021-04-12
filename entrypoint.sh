@@ -140,6 +140,18 @@ if [ "${WECHAT_URL}" != "" ]; then
   curl -s "${WECHAT_URL}?key=${WECHAT_KEY}&text=SpotTermination&desp=${desp}"
 fi
 
+# Notify Mattermost incoming-webhook
+# Docs: https://docs.mattermost.com/developer/webhooks-incoming.html
+#
+# You will have to set MATTERMOST_WEBHOOK as an environment variable via PodSpec.
+# The URL should look something like: https://myworkspace.mattermost.com/hooks/124yyyyyyyyyyj1zzzzzzzzzzz
+# If your webhook is locked to a specific mattermost channel, the MATTERMOST_CHANNEL variable will be ignored and send the alert to the channel is locked with the webhook.
+
+if [ "${MATTERMOST_WEBHOOK}" != "" ]; then
+  color="warning"
+  curl -s -X POST --data "payload={\"username\":\"${MATTERMOST_USERNAME}\",\"icon_url\":\"${MATTERMOST_ICON_URL}\", \"channel\":\"${MATTERMOST_CHANNEL}\",\"attachments\":[{\"fallback\":\"${MESSAGE}\",\"title\":\":warning: Spot Termination ${CLUSTER_INFO}\",\"color\":\"${color}\",\"fields\":[{\"title\":\"Node\",\"value\":\"${NODE_NAME}\",\"short\":false},{\"title\":\"Instance\",\"value\":\"${INSTANCE_ID}\",\"short\":true},{\"title\":\"Instance Type\",\"value\":\"${INSTANCE_TYPE}\",\"short\":true},{\"title\":\"Availability Zone\",\"value\":\"${AZ}\",\"short\":true}]}]}" "${MATTERMOST_WEBHOOK}"
+fi
+
 # Detach from autoscaling group, which will cause faster replacement
 # We do this in parallel with the drain (see the & at the end of the command).
 if [ "${DETACH_ASG}" != "false" ] && [ "${ASG_NAME}" != "" ]; then
