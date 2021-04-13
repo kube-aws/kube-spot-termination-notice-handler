@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3-alpine3.12
 
 ARG KUBE_VERSION=1.21.0
 ENV HOME=/srv
