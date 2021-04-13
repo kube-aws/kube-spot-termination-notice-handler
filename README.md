@@ -56,7 +56,7 @@ Introduced in version 0.9.2 of this application (the @mumoshu version), you are 
 
 Incoming WebHooks require that you set the SLACK_URL environmental variable as part of your PodSpec.
 
-You can also set SLACK_CHANNEL to send message to different slack channel insisted of default slack webhook url's channel.
+You can also set SLACK_CHANNEL to send the message to different slack channel insisted of default slack webhook url's channel.
 
 The URL should look something like: https://hooks.slack.com/services/T67UBFNHQ/B4Q7WQM52/1ctEoFjkjdjwsa22934
 
@@ -154,7 +154,49 @@ Example Pod Spec:
           - name: DETACH_ASG
             value: "true"
 ```
+## Mattermost Notifications
 
+Incoming WebHooks require that you set the `MATTERMOST_WEBHOOK` environmental variable as part of your `PodSpec`.
+
+You can also set `MATTERMOST_CHANNEL` to send the message to different mattermost channel insisted of default mattermost webhook url's channel, 
+unless the webhook is locked to a specific Mattermost channel.
+
+The Webhook URL should look something like: https://myworkspace.mattermost.com/hooks/124yyyyyyyyyyj1zzzzzzzzzzz
+
+Mattermost Setup:
+* Docs:https://docs.mattermost.com/developer/webhooks-incoming.html
+
+
+Show where things are happening by setting the `CLUSTER` environment variable to whatever you call your cluster.
+Very handy if you have several clusters that report to the same Mattermost channel.
+
+Other environmental variables that are optional to set are MATTERMOST_USERNAME, MATTERMOST_ICON_URL,
+if not set Mattermost will use defaults. 
+
+Example Pod Spec:
+
+```
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MATTERMOST_WEBHOOK
+            value: "https://myworkspace.mattermost.com/hooks/124yyyyyyyyyyj1zzzzzzzzzzz"
+          - name: MATTERMOST_USERNAME
+            value: "spot-monitor-bot"  
+          - name: MATTERMOST_CHANNEL
+          - value: "spot-notifications"
+          - name: CLUSTER
+            value: development
+```
+
+_Note:_ Mattermost is compatible with Slack notifications, so you can use it with the above Slack Notifications setup.
+This specific webhook adds some extra functionality.
 ## AutoScaling Detachment
 
 **This feature currently only supports simple autoscaling - no spot fleet or similar.**
