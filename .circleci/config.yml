@@ -1,0 +1,106 @@
+version: 2.1
+executors:
+  default:
+    docker:
+    - image: cimg/base:2021.12
+
+jobs:
+  push-docker-pr:
+    executor:
+      name: default
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: make build-image
+    - run: |
+        set -e
+        set -u
+        export TAG="${CIRCLE_SHA1:0:7}"
+        echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+        docker tag mattermost/kube-spot-termination-notice-handler:test mattermost/kube-spot-termination-notice-handler:$TAG
+        docker push mattermost/kube-spot-termination-notice-handler:$TAG
+
+  push-docker:
+    executor:
+      name: default
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: make build-image
+    - run: |
+        set -e
+        set -u
+        if [[ -z "${CIRCLE_TAG:-}" ]]; then
+          echo "Pushing lastest for $CIRCLE_BRANCH..."
+          TAG=latest
+        else
+          echo "Pushing release $CIRCLE_TAG..."
+          TAG="$CIRCLE_TAG"
+        fi
+        echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+        docker tag mattermost/kube-spot-termination-notice-handler:test mattermost/kube-spot-termination-notice-handler:$TAG
+        docker push mattermost/kube-spot-termination-notice-handler:$TAG
+
+  scan-image:
+    docker:
+    - image: registry.gitlab.com/gitlab-org/security-products/analyzers/klar:latest
+      environment:
+        GIT_STRATEGY: none
+        CI_APPLICATION_REPOSITORY: mattermost/kube-spot-termination-notice-handler
+        CLAIR_DB_CONNECTION_STRING: "postgresql://postgres:password@localhost:5432/postgres?sslmode=disable&statement_timeout=60000"
+        DOCKERFILE_PATH: "build/Dockerfile"
+    - image: arminc/clair-db:latest
+    steps:
+    - checkout
+    - run: |
+        export CI_APPLICATION_TAG="${CIRCLE_SHA1:0:7}"
+        export DOCKER_USER=$DOCKER_USERNAME
+        /analyzer run
+    - store_artifacts:
+        path: gl-container-scanning-report.json
+        destination: security-scan
+
+  release:
+    executor: default
+    steps:
+      - checkout
+      - run:
+          command: |
+            make deps
+            make release
+workflows:
+  version: 2
+  ci-build:
+    jobs:
+    - push-docker-pr:
+        context: matterbuild-docker
+    - scan-image:
+        context: matterbuild-docker
+        requires:
+        - push-docker-pr
+  master-build:
+    jobs:
+    - push-docker:
+          context: matterbuild-docker
+          filters:
+            branches:
+              only:
+              - master
+  tag-builds:
+    jobs:
+    - push-docker:
+        context: matterbuild-docker
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /.*/
+
+  publish-github-release:
+    jobs:
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/

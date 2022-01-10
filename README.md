@@ -3,24 +3,13 @@ Once a termination notice is received, it will try to gracefully stop all the po
 
 ## Installation
 
-### Helm
-
-A helm chart has been created for this tool, and at time of writing was in the `stable` repository.
-
-    $ helm install stable/k8s-spot-termination-handler
-
 ## Available docker images/tags
 
 Tags denotes Kubernetes/`kubectl` versions.
 Using the same version for your Kubernetes cluster and spot-termination-notice-handler is recommended.
 Note that the `-1` (or similar) is the revision of this tool, in case we need versioning.
 
-* `kubeaws/kube-spot-termination-notice-handler:1.8.5-1`
-* `kubeaws/kube-spot-termination-notice-handler:1.9.0-1`
-* `kubeaws/kube-spot-termination-notice-handler:1.10.11-2`
-* `kubeaws/kube-spot-termination-notice-handler:1.11.3-1`
-* `kubeaws/kube-spot-termination-notice-handler:1.12.0-2`
-* `kubeaws/kube-spot-termination-notice-handler:1.13.7-1`
+* `mattermost/kube-spot-termination-notice-handler:1.21.0`
 
 ## Why use it
 
@@ -165,10 +154,12 @@ The autoscaling group name is automatically detected by the handler.
 
 ## Credits
 
-kube-spot-termination-notice-handler is a collaborative project to unify [@mumoshu and @kylegato's initial work](https://github.com/mumoshu/kube-spot-termination-notice-handler) and [@egeland's fork with various enhancements and simplifications](https://github.com/egeland/kube-spot-termination-notice-handler).
+This project is forked from: kube-aws/kube-spot-termination-notice-handler which is a collaborative project to unify [@mumoshu and @kylegato's initial work](https://github.com/mumoshu/kube-spot-termination-notice-handler) and [@egeland's fork with various enhancements and simplifications](https://github.com/egeland/kube-spot-termination-notice-handler).
 
-The project is currently maintained by:
+The parent project is currently maintained by:
 
 - @egeland
 - @kylegato
 - @mumoshu
+
+We took the decision to fork repository to support Mattemost Webhooks functionality and do some security patches, as it looks that unfortunately the parent directory is not actively maintained at the moment.
